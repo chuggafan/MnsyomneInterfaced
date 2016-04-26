@@ -1,0 +1,10 @@
+[Unit]
+Description=Start Mnemosyne
+
+[Service]
+Type=simple
+ExecStart=/var/bot/mnemosyne.py
+WorkingDirectory=/var/bot
+
+[Install]
+WantedBy=multi-user.target
