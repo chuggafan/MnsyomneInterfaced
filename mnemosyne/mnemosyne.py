@@ -14,7 +14,7 @@ from time import sleep
 from urlparse import urlparse
 
 def main():
-	print('Mnemosyne reborn by /u/ITSigno')
+	print('Mnemosyne reborn by /u/ITSigno and chugga_fan (for autoconfiguration)')
 
 	# verify that the config file exists
 	if not os.path.exists('mnemosyne.cfg'):

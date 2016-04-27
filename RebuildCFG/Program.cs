@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
 
@@ -19,10 +15,13 @@ namespace RebuildCFG
             Console.ReadKey();
             if (!File.Exists(path + @"\mnemosyne.cfg"))
             {
+                Console.WriteLine("Input the username for your archive bot");
+                string username = Console.ReadLine();
+                Console.WriteLine("Every time you use this bot input the password, this is done at a later step, saving to config files is stupid as hell");
                 File.WriteAllText(path + @"\mnemosyne.cfg", @"
 [Bot]
 useragent: Mnemosyne Reborn by / u / ITSigno
-username: mnemosyne - 0001
+username: " + username +@"
 password:
 
 [Reddit]
