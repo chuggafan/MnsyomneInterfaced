@@ -45,7 +45,7 @@ exclude: archive\.is, youtube\.com, web\.archive\.org
             ProcessStartInfo info = new ProcessStartInfo(python);
             info.UseShellExecute = false;
             info.RedirectStandardOutput = true;
-            info.Arguments = cmd;
+            info.Arguments = "\"" + cmd + "\"";
             Process myProcess = new Process();
             myProcess.StartInfo = info;
             myProcess.Start();
