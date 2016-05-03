@@ -31,8 +31,6 @@ subreddit: kotakuinaction
 [Config]
 submit_url: http://archive.is/submit/
 sleep_time: 60
-exclude: archive\.is, youtube\.com, web\.archive\.org
-
 ");
             }
             run_cmd(path + @"\mnemosyne.py");

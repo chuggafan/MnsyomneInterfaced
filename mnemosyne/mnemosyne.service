@@ -1,10 +1,10 @@
 [Unit]
-Description=Start Mnemosyne
+Description=Mnemosyne Auto-Archive Bot
 
 [Service]
 Type=simple
-ExecStart=/var/bot/mnemosyne.py
-WorkingDirectory=/var/bot
+ExecStart=/var/bot/mnemosyne/mnemosyne.py
+WorkingDirectory=/var/bot/mnemosyne
 
 [Install]
 WantedBy=multi-user.target

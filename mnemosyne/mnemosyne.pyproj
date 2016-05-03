@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{754312b1-8d7c-4b84-ba17-e7da770a6066}</ProjectGuid>
+    <ProjectGuid>{6a7e4ab1-b22c-407f-b143-baa34a323e43}</ProjectGuid>
     <ProjectHome />
     <StartupFile>mnemosyne.py</StartupFile>
     <SearchPath />
@@ -22,6 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="error_log.txt" />
+    <Content Include="failed.txt" />
     <Content Include="replied_to.txt" />
   </ItemGroup>
   <ItemGroup>

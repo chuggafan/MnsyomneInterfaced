@@ -14,15 +14,15 @@ from time import sleep
 from urlparse import urlparse
 
 def main():
-	print('Mnemosyne reborn by /u/ITSigno and chugga_fan (for autoconfiguration)')
+	print('Mnemosyne reborn by /u/ITSigno')
 
 	# verify that the config file exists
 	if not os.path.exists('mnemosyne.cfg'):
-		print('No config file')
-		sys.exit()
+		print('No config file.')
+		sys.exit() #bail
 
 	# parse the config file
-	config = ConfigParser.ConfigParser()
+	config = ConfigParser.ConfigParser();
 	config.read('mnemosyne.cfg')
 
 	# get the basic info for the bot user
@@ -38,10 +38,8 @@ def main():
 	SUBMIT_URL = config.get('Config', 'submit_url')
 	SLEEP_TIME = config.getint('Config', 'sleep_time')
 
-	# TODO make the exclude system friendlier
-	# Note, the excluded terms still need to have periods escaped
-	EXCLUDE = config.get('Config', 'exclude')
-	EXCLUDE = re.compile("|".join(EXCLUDE.split(',\s?')))
+	# TODO Move exclusions into confiog file
+	EXCLUDE = re.compile('youtube\.com|archive\.is|web\.archive\.org')
 
 	# Login to reddit
 	# TODO setup OAuth method
@@ -56,7 +54,7 @@ def main():
 	p_head = "Archive links for this post: \n\n"
 
 	# BotLivesMatter
-	foot = "----\n\nI am Mnemosyne reborn. This space for rent. ^^^/r/botsrights"
+	foot = "----\n\nI am Mnemosyne reborn. 418 I'm a teapot. ^^^/r/botsrights"
 
 	# initialize our array of "already_done" posts, so we don't repeat work
 	if not os.path.exists('replied_to.txt'):
@@ -85,21 +83,10 @@ def main():
 					if EXCLUDE.search(parsed_uri.netloc) is not None:
 						continue
 
-					# add the timestamp parameter to the post's url, and submit to archive.is
-					req = requests.post(SUBMIT_URL, data={'url':furl(p.url).add({ 'ar': str(time.time())})})
-
-					# grab the headers
-					loc = req.headers.get('location')
-					ref = req.headers.get('refresh')
-
-					# if the url has been archived before, archive.is returns a location header. If it's new, it sends a refresh header
-					url = ''
-					if ref:
-						url = re.sub(r'^\d+;url=','', ref) 
-					elif loc:
-						url = loc
+					url = get_archive_url(SUBMIT_URL,p.url)
 					
 					if not url:
+						log("Failed to archive: " + p.permalink + "\nurl: " + url, file="failed.txt")
 						continue #failed to get url
 
 					# use the right head based on post type
@@ -111,14 +98,47 @@ def main():
 						
 			sleep(SLEEP_TIME)
 		except Exception as e:
-			now = datetime.datetime.now()
-			with open('error_log.txt', 'a') as f:
-				f.write(now.strftime("%m-%d-%Y %H:%M"))
-				f.write(traceback.format_exc())
-				f.write('ERROR: ' + str(e))
-				f.write('Going to sleep...\n')
+			log(traceback.format_exc() + "\n" + 'ERROR: ' + str(e) + "\n", file="error_log.txt")
 			sleep(SLEEP_TIME)
 			continue
 			
+
+def log(message, **kwargs):
+	logfile = kwargs.get('file', 'error_log.txt')
+	now = datetime.datetime.now()
+	with open(logfile, 'a') as f:
+		f.write(now.strftime("%m-%d-%Y %H:%M\n"))
+		f.write(str(message) + "\n")
+
+
+def get_archive_url(service_url, url):
+	req = requests.post(service_url, data={'url':url}, allow_redirects=False)
+	loc = req.headers.get('Location')
+	ref = req.headers.get('Refresh')
+
+	archive_url = ''
+	if ref:
+		archive_url = re.sub('^\d+;url=','', ref)
+	else:
+		#failed to get fresh archive
+		#fallback will use a hash if possible, query param otherwise
+		f = furl(url)
+		if not str(f.fragment):
+			f.fragment.path = str(time.time());
+		else:
+			f.add({ 'ar': str(time.time())})
+		
+		freq = requests.post(service_url, data={'url':f.url}, allow_redirects=False)
+		fref = freq.headers.get('refresh')
+		floc = freq.headers.get('location')
+
+		if fref:
+			archive_url = re.sub('^\d+;url=','', fref)
+		elif floc:
+			archive_url = floc
+
+		#anything else is a failure
+	
+	return archive_url
 			
 main()
